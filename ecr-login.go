@@ -30,7 +30,7 @@ func check(e error) {
 }
 
 // default template prints docker login command
-const DEFAULT_TEMPLATE = `{{range .}}docker login -u {{.User}} -p {{.Pass}} {{.ProxyEndpoint}}
+const DEFAULT_TEMPLATE = `{{range .}}docker login -u {{.User}} -p {{.Pass}} https://{{.ProxyEndpoint}}
 {{end}}`
 
 // load template from file or use default
@@ -103,13 +103,14 @@ func main() {
 
 		// extract username and password
 		token := strings.SplitN(string(data), ":", 2)
+                nakedEndpoint := strings.TrimPrefix(*(auth.ProxyEndpoint), "https://")
 
 		// object to pass to template
 		fields[i] = Auth{
 			Token:         *auth.AuthorizationToken,
 			User:          token[0],
 			Pass:          token[1],
-			ProxyEndpoint: *(auth.ProxyEndpoint),
+			ProxyEndpoint: nakedEndpoint,
 			ExpiresAt:     *(auth.ExpiresAt),
 		}
 	}
